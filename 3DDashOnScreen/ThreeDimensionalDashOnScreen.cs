@@ -1,21 +1,21 @@
 ﻿using HarmonyLib;
-using NeosModLoader;
 using FrooxEngine;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Linq;
 using System.Reflection;
 using System;
-using BaseX;
+using Elements.Core;
+using ResoniteModLoader;
 
 
 namespace ThreeDimensionalDashOnScreen
 {
-    public class ThreeDimensionalDashOnScreen : NeosMod
+    public class ThreeDimensionalDashOnScreen : ResoniteMod
 	{
 		public override string Name => "3DDashOnScreen";
 		public override string Author => "rampa3";
-		public override string Version => "3.5.0";
+		public override string Version => "3.6.0";
 		public override string Link => "https://github.com/rampa3/3DDashOnScreen";
 		private static ModConfiguration Config;
 		private static bool desktopNotificationsPresent = false;
@@ -57,8 +57,8 @@ namespace ThreeDimensionalDashOnScreen
 
 		void checkForDesktopNotifications()
         {
-			IEnumerable<NeosModBase> mods = ModLoader.Mods();
-			foreach (NeosModBase mod in mods)
+			IEnumerable<ResoniteModBase> mods = ModLoader.Mods();
+			foreach (ResoniteModBase mod in mods)
             {
 				if (mod.Name == "DesktopNotifications")  //check for DesktopNotifications, and if present, set a boolean to tell the patch about its presence
                 {
@@ -83,7 +83,7 @@ namespace ThreeDimensionalDashOnScreen
 
 		private static void disableForceItemKeepGrabbed(Harmony harmony)
         {
-			MethodInfo original = AccessTools.DeclaredMethod(typeof(CommonTool), "OnInputUpdate", new Type[] { });
+			MethodInfo original = AccessTools.DeclaredMethod(typeof(InteractionHandler), "OnInputUpdate", new Type[] { });
 			MethodInfo transpiler = AccessTools.DeclaredMethod(typeof(ThreeDimensionalDashOnScreen), nameof(disableForceItemKeepGrabbedTranspiler));
 			harmony.Patch(original, transpiler: new HarmonyMethod(transpiler));
 			Debug("Forcing keep last item held when dash is open patched out!");
@@ -123,7 +123,7 @@ namespace ThreeDimensionalDashOnScreen
 
 		private static void patchNotifications(Harmony harmony)
         {
-			MethodInfo original = AccessTools.DeclaredMethod(typeof(NotificationPanel), "AddNotification", new Type[] { typeof(string), typeof(string), typeof(Uri), typeof(color), typeof(string), typeof(Uri), typeof(IAssetProvider<AudioClip>) });
+			MethodInfo original = AccessTools.DeclaredMethod(typeof(NotificationPanel), "AddNotification", new Type[] { typeof(string), typeof(string), typeof(Uri), typeof(colorX), typeof(string), typeof(Uri), typeof(IAssetProvider<AudioClip>) });
 			MethodInfo transpiler = AccessTools.DeclaredMethod(typeof(ThreeDimensionalDashOnScreen), nameof(NotificationsTranspiler));
 			harmony.Patch(original, transpiler: new HarmonyMethod(transpiler));
 			Debug("Notifications patched!");
